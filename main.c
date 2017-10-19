@@ -3,12 +3,14 @@
 #include "Library/GPIO.h"
 #include "Library/Joystick.h"
 #include "Library/PWM.h"
-
+int speed = 100;
 void init() {
 	Joystick_Init();
 	
 	PWM_Init();
-	PWM_Write(0);
+	PCONP |= (1<<6);
+	PORT1->DIR |= (1<<24)|(1<<23);
+	
 }
 
 // When code start, LED should be turned off.
@@ -18,19 +20,37 @@ void init() {
 // When you press the LEFT button of the Joystick, LED will blink (2 times in a second).
 // When you press the RIGHT button of the Joystick, LED will blink (10 times in a second).
 void update() {
+	
 	if(Joystick_Up_Pressed()){
-		PWM_Cycle_Rate(10);
+		uint32_t value = PORT1->PIN;
+	value &= ~(1<<24);
+	value |= (1<<23);
+	PORT1->PIN = value;
 		PWM_Write(100);
 	}else if(Joystick_Center_Pressed()){
-		PWM_Cycle_Rate(10);
-		PWM_Write(50);
+		
 	}else if(Joystick_Down_Pressed()){
-		PWM_Cycle_Rate(10);
+		 uint32_t value = PORT1->PIN;
+	value |= (1<<24);
+	value |= (1<<23);
+		
+	PORT1->PIN = value;
 		PWM_Write(0);
 	}else if(Joystick_Left_Pressed()){
-		PWM_Cycle_Rate(500);
+		int i = 0;
+		int j = 0;
+		for(i;i<100000000;i++){
+		}
+		speed = speed - 10;
+		PWM_Write(speed);
+		
 	}else if(Joystick_Right_Pressed()){
-   	PWM_Cycle_Rate(100);
+		uint32_t value = PORT1->PIN;
+	value |= (1<<24);
+	value &= ~(1<<23);
+	PORT1->PIN = value;
+		PWM_Write(100);
+   	
 	}
 }
 
